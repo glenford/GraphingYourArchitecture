@@ -1,5 +1,5 @@
 (ns graph-your-arch.aws
- (:require [aws.amazonica.aws.ec2 :as ec2]))
+ (:require [amazonica.aws.ec2 :as ec2]))
 
 
 (defn get-regions

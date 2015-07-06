@@ -27,7 +27,7 @@ To run the code:
 	graph-your-arch.core=> (go)
 
 
-You can then either use the repl to explore the graph or use the [neo4j web console](http://localhost:7474)
+It will attempt to open your browser to the neo4j web console so you can explore your graph further.
 
 
 License

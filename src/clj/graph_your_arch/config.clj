@@ -5,7 +5,8 @@
 ;
 (defonce neo4j-server-host "localhost")
 (defonce neo4j-server-port 7474)
-(defonce neo4j-server-uri (format "http://%s:%d/db/data" neo4j-server-host neo4j-server-port)
+(defonce neo4j-server-uri (format "http://%s:%d/db/data" neo4j-server-host neo4j-server-port))
+(defonce neo4j-browser-uri (format "http://%s:%d/browser/" neo4j-server-host neo4j-server-port))
 
 ;
 ; AWS configuration
