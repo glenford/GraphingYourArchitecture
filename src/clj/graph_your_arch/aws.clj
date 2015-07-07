@@ -12,3 +12,8 @@
   [endpoint]
   (:availability-zones (ec2/describe-availability-zones {:endpoint endpoint})))
 
+(defn get-reservations
+  "Gets the AWS Instance reservations with associated instances for the associated region endpoint"
+  [endpoint]
+  (:reservations (ec2/describe-instances {:endpoint endpoint})))
+

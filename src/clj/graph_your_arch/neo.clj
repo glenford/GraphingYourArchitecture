@@ -40,7 +40,7 @@
   "Helper function to build a cypher query from a template"
   [template params]
   (try
-    (apply format (clojure.string/join template) (escape-params params))
+    (apply format (clojure.string/join " " template) (escape-params params))
     (catch Exception e (do
       (println ">> " e "\n\n" template "\n\n" params)
       (throw e)))))

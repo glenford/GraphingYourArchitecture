@@ -12,6 +12,8 @@
   (importer/regions)
   (println "Importing availability zones...")
   (importer/availability-zones)
+  (println "Importing instances...")
+  (importer/instances)
   (browse/browse-url config/neo4j-browser-uri))
 
 (defn -main [& args]
