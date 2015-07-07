@@ -7,3 +7,8 @@
   []
   (:regions (ec2/describe-regions)))
 
+(defn get-azs
+  "Gets a map of availability zones for the associated region endpoint"
+  [endpoint]
+  (:availability-zones (ec2/describe-availability-zones {:endpoint endpoint})))
+

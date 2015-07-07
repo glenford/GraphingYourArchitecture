@@ -8,7 +8,10 @@
   "Entry point to query AWS resources and then build a graph in neo4j"
   []
   (println "Importing your AWS infrastructure into a graph.")
+  (println "Importing regions...")
   (importer/regions)
+  (println "Importing availability zones...")
+  (importer/availability-zones)
   (browse/browse-url config/neo4j-browser-uri))
 
 (defn -main [& args]
