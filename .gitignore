@@ -1,6 +1,7 @@
 target
 .*.swp
 .lein-repl-history
+.nrepl-port
 .idea
 *.iml
 aws.log

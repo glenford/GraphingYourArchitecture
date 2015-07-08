@@ -14,6 +14,9 @@
   (importer/availability-zones)
   (println "Importing instances...")
   (importer/instances)
+  (println "Importing elastic load-balancers...")
+  (importer/elbs)
+  (println "Importing dns entries...")
   (browse/browse-url config/neo4j-browser-uri))
 
 (defn -main [& args]
