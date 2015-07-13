@@ -17,6 +17,7 @@
   (println "Importing elastic load-balancers...")
   (importer/elbs)
   (println "Importing dns entries...")
+  (importer/dns)
   (browse/browse-url config/neo4j-browser-uri))
 
 (defn -main [& args]

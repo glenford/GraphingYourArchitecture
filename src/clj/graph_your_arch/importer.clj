@@ -64,7 +64,6 @@
   []
   (doseq [region (get-regions)
           elb (aws/get-elbs region)]
-    (println ">> " region "  " (:load-balancer-name elb) )
     (let [name (str (:region-name region) "/" (:load-balancer-name elb))
           instances (:instances elb)
           instance-ids (for [i instances] (:instance-id i))
@@ -75,14 +74,72 @@
                           "MATCH (i:Instance) where i.id in %s"
                           "WITH az,i"
                           "  MERGE (elb:ELB {name:'%s'})"
-                          "  MERGE (dns:DNS {fdqn:'%s'})"
+                          "  MERGE (dns:DNS {dns:'%s'})"
                           "  MERGE (elb)-[:REACHED_BY]->(dns)"
                           "  MERGE (elb)-[:IN]->(az)"
                           "  MERGE (elb)-[:BALANCES]->(i)"]
                          [azs instance-ids name dns])]
       (neo/run-cypher cypher-query))))
 
+
+(defn- strip-trailing-period [string]
+  (.replaceAll string "\\.$" ""))
+
+
+(defn add-a-record
+  "import an a-record into the graph"
+  [record]
+  (let [name (strip-trailing-period (:name record))
+        ipaddrs (for [entry (:resource-records record)] (:value entry))
+        cypher-query (neo/def-cypher
+                       ["MERGE (dns:DNS {dns:'%s'})"
+                        "  SET dns:A_RECORD"
+                        "  WITH dns"
+                        "    UNWIND %s AS _ip"
+                        "    MERGE (ipaddr:IPADDR {ip:_ip})"
+                        "    MERGE (dns)-[:POINTS_TO]->(ipaddr)"]
+                       [name ipaddrs])]
+    (neo/run-cypher cypher-query)))
+
+
+(defn add-a-record-alias
+  "import an a-record alias into the graph"
+  [record]
+  (let [name (strip-trailing-period (:name record))
+        alias (strip-trailing-period (:dnsname (:alias-target record)))
+        cypher-query (neo/def-cypher
+                       ["MERGE (dns:DNS {dns:'%s'})"
+                        "  SET dns:A_RECORD"
+                        "  WITH dns"
+                        "    MERGE (alias:DNS {dns:'%s'})"
+                        "    MERGE (dns)-[:ALIAS_FOR]->(alias)"]
+                       [name alias])]
+    (neo/run-cypher cypher-query)))
+
+
+
+
+(defn add-cname
+  "import a cname into the graph"
+  [record]
+  (let [name (strip-trailing-period (:name record))
+        named (for [entry (:resource-records record)] (strip-trailing-period (:value entry)))
+        cypher-query (neo/def-cypher
+                       ["MERGE (dns:DNS {dns:'%s'})"
+                        "  SET dns:CNAME"
+                        "  WITH dns"
+                        "    UNWIND %s AS _named"
+                        "    MERGE (named:DNS {dns:_named})"
+                        "    MERGE (dns)-[:POINTS_TO]->(named)"]
+                       [name named])]
+    (neo/run-cypher cypher-query)))
+
 (defn dns
   "import dns entries into the graph"
   []
-  )
+  (doseq [record (aws/get-dns)]
+    (cond
+      (and (= (:type record) "A") (contains? record :alias-target)) (add-a-record-alias record)
+      (= (:type record) "A") (add-a-record record)
+      (= (:type record) "CNAME") (add-cname record)
+      :else nil))) ; ignore others for time being
