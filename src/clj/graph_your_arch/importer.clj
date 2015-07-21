@@ -82,7 +82,9 @@
       (neo/run-cypher cypher-query))))
 
 
-(defn- strip-trailing-period [string]
+(defn- strip-trailing-period
+  "remove a trailing . if present"
+  [string]
   (.replaceAll string "\\.$" ""))
 
 
@@ -117,8 +119,6 @@
     (neo/run-cypher cypher-query)))
 
 
-
-
 (defn add-cname
   "import a cname into the graph"
   [record]
@@ -135,7 +135,7 @@
     (neo/run-cypher cypher-query)))
 
 (defn dns
-  "import dns entries into the graph"
+  "import dns entries (A-Records and CNAMES) into the graph"
   []
   (doseq [record (aws/get-dns)]
     (cond
